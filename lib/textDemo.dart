@@ -17,7 +17,6 @@ class _TextDemoState extends State<TextDemo> {
   String filepath = '';
   String jsonData = '';
   String start = '';
- 
 
   void initState() {
     Timer.periodic(const Duration(hours: 1), (timer) {
@@ -66,11 +65,12 @@ class _TextDemoState extends State<TextDemo> {
                           Text(
                             'Start',
                             textAlign: TextAlign.center,
-
                           ),
-                          SizedBox(
-                              width: 8.0), 
-                          Icon(Icons.play_arrow), 
+                          SizedBox(width: 8.0),
+                          Icon(
+                            Icons.play_arrow,
+                            color: Colors.green, // set the color of the Icon
+                          ),
                         ],
                       ),
                     ),
@@ -84,8 +84,8 @@ class _TextDemoState extends State<TextDemo> {
                         _exitApp();
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.blueGrey), 
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.blueGrey),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -94,10 +94,11 @@ class _TextDemoState extends State<TextDemo> {
                             'End',
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(
-                              width:
-                                  8.0), 
-                          Icon(Icons.stop), 
+                          SizedBox(width: 8.0),
+                          Icon(
+                            Icons.stop,
+                            color: Colors.red, // set the color of the Icon
+                          ),
                         ],
                       ),
                     ),
@@ -110,13 +111,26 @@ class _TextDemoState extends State<TextDemo> {
           Expanded(
             flex: 9,
             child: Container(
-              color: Colors.cyan[50], 
+              color: Colors.cyan[50],
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                 start =='config'? Center(child: Text('$filepath . $run', style: const TextStyle(fontSize: 18),),):start!='' && start != 'config'? Center(child: Text(start, style:  TextStyle(fontSize: 21),)):Container(),
-                  
+                  start == 'config'
+                      ? Center(
+                          child: Text(
+                            '$filepath = $run',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        )
+                      : start != '' && start != 'config'
+                          ? Center(
+                              child: Text(
+                              start,
+                              style: TextStyle(fontSize: 21),
+                            ))
+                          : Container(),
+
                   //CircularProgressIndicator(),
                 ],
               ),
@@ -132,28 +146,26 @@ class _TextDemoState extends State<TextDemo> {
   }
 
   _runConflig() {
-     final myBox5 = Hive.box('myBox');
+    final myBox5 = Hive.box('myBox');
     setState(() {
       start = 'config';
-      filepath = 'File PathF:/textDemo.txt';
+      filepath = 'First File Path is - F:/textDemo.txt';
       run = myBox5.get('LASTNUMBER').toString();
-            // run = 'Text File LastNumber : 192';
+      // run = 'Text File LastNumber : 192';
     });
   }
 
   _SubmitData() async {
-    start  = 'App is running';
-     //CircularProgressIndicator();
+    start = 'App is running';
+    //CircularProgressIndicator();
     var getData = await AllServices().getFileData();
     List? finalList = AllServices().getFinalData(getData);
     jsonData = jsonEncode(finalList);
     print(jsonData);
-    if(finalList.isNotEmpty){
- final response = await AllServices().submitData(finalList);
- print(
-      jsonDecode(response.body)
-    );
-  }
+    if (finalList.isNotEmpty) {
+      final response = await AllServices().submitData(finalList);
+      print(jsonDecode(response.body));
+    }
     setState(() {});
   }
 }
