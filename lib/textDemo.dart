@@ -13,10 +13,10 @@ class TextDemo extends StatefulWidget {
 }
 
 class _TextDemoState extends State<TextDemo> {
-  String run = '';
-  String filepath = '';
   String jsonData = '';
   String start = '';
+  String filepath = '';
+  String lastLineNo = '';
 
   void initState() {
     Timer.periodic(const Duration(hours: 1), (timer) {
@@ -119,7 +119,7 @@ class _TextDemoState extends State<TextDemo> {
                   start == 'config'
                       ? Center(
                           child: Text(
-                            '$filepath = $run',
+                            '$filepath = $lastLineNo',
                             style: const TextStyle(fontSize: 18),
                           ),
                         )
@@ -150,7 +150,7 @@ class _TextDemoState extends State<TextDemo> {
     setState(() {
       start = 'config';
       filepath = 'First File Path is - F:/textDemo.txt';
-      run = myBox5.get('LASTNUMBER').toString();
+      lastLineNo = myBox5.get('LASTNUMBER').toString();
       // run = 'Text File LastNumber : 192';
     });
   }

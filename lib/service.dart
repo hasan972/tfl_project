@@ -82,12 +82,12 @@ class AllServices {
 
           //Employee Info//
           employeeInfo = lines[i + 1];
-          List<String> emp =
-              employeeInfo.replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+          List<String> emp = employeeInfo.replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
           employeeID = emp[0];
           epmployeeName = emp[1];
           terminal_id = emp[2];
-
+          
+          //Order Type//
           order_type = lines[i + 5].trim();
 
           // Subtotal//
