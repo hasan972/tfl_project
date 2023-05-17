@@ -61,6 +61,12 @@ class AllServices {
     int increment = 0;
     String discount = '';
     bool nextChkFound;
+    bool sdFound;
+    //last update//
+    bool vatFound;
+    bool subTotalFound;
+    bool discountFound;
+    String chkopenTime = '';
 //........Store the data into this list............//
     List transactions = [];
     var lastNumber = lines.length;
@@ -71,9 +77,12 @@ class AllServices {
 
     for (int i = startNumber; i < lastNumber; i++) {
       if (lines[i].contains('Chk ')) {
-        chkNo = lines[i].replaceAll('\r', '');
+        // chkNo = lines[i].replaceAll('\r', '');
         if (lines[i].indexOf('Chk') == 0) {
-          chkNo = lines[i];
+          //  chkNo = lines[i];
+          List<String> chk =
+              lines[i].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+          chkNo = chk[0] + ' ' + chk[1];
 
           // Next chk line
           nextChkFound = false;
@@ -101,7 +110,13 @@ class AllServices {
 
           order_type = lines[i + 5].trim();
 
+          //last update
+          List<String> openTime =
+              lines[i + 3].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+          chkopenTime = openTime[3];
+
           // Subtotal//
+          subTotalFound = false;
           for (int j = i + 1; j < nextChk; j++) {
             if (lines[j].contains('Subtotal')) {
               List<String> SubTot =
@@ -117,8 +132,13 @@ class AllServices {
               break;
             }
           }
+          if (!subTotalFound) {
+            subTotal = '0';
+            paymentMode = '';
+          }
 
           //VAT //
+          vatFound = false;
           for (int k = i + 1; k < nextChk; k++) {
             if (lines[k].contains('VAT')) {
               List<String> ValueAddedTax =
@@ -127,8 +147,12 @@ class AllServices {
               break;
             }
           }
+           if (!vatFound) {
+            vat = '0';
+          }
 
           // SD //
+          sdFound = false;
           for (int l = i + 1; l < nextChk; l++) {
             if (lines[l].contains('SD')) {
               List<String> sd_value =
@@ -139,23 +163,25 @@ class AllServices {
               sd = '0';
             }
           }
+          if (!sdFound) {
+            sd = '0';
+          }
 
           // Item //
           var itemList = [];
           for (int k = i + 1; k < nextChk; k++) {
             if (countLeadingWhitespace(lines[k]) == 2) {
               List<String> itm =
-                  lines[k].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
-              item_price = itm[itm.length - 1];
+              lines[k].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+              item_price = itm[itm.length - 1].replaceAll(RegExp(r'[^.0-9]'), '');
               itm.removeLast();
               item_name = itm.join(' ');
-
               itemList.add({'name': item_name, 'price': item_price});
             }
           }
 
           // Discount//
-
+          discountFound = false;
           for (int p = i + 1; p < nextChk; p++) {
             if (lines[p].contains('DIS-')) {
               List<String> discountAmt =
@@ -167,6 +193,9 @@ class AllServices {
               discount = '0';
             }
           }
+          if (!discountFound) {
+              discount = '0';
+            }
 
           // Tax Info List
           var taxes = [];
@@ -223,16 +252,17 @@ class AllServices {
   Future<http.Response> submitData(jsondata) async {
     http.Response response;
 
-    var username = 'apiuser';
-    var password = 'itsaDrill007';
-    print('Basic ${base64.encode(utf8.encode('$username:$password'))}');
+    // var username = 'apiuser';
+    // var password = 'itsaDrill007';
+    // print('Basic ${base64.encode(utf8.encode('$username:$password'))}');
 
     response = await http.post(
-        Uri.parse('http://w011.yeapps.com/tfl/api_tfl/receive_to_tfl'),
-        headers: <String, String>{
-          'Authorization':
-              'Basic ${base64.encode(utf8.encode('$username:$password'))}'
-        },
+        //Uri.parse('http://w011.yeapps.com/tfl/api_tfl/receive_to_tfl'),
+Uri.parse('http://10.168.27.168/tfl/api_tfl_insert/_entry'),
+        // headers: <String, String>{
+        //   'Authorization':
+        //       'Basic ${base64.encode(utf8.encode('$username:$password'))}'
+        // },
         body: jsonEncode(jsondata));
 
     return response;

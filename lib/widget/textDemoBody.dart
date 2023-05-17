@@ -1,120 +1,253 @@
-// import 'package:flutter/material.dart';
+// import 'dart:convert';
+// import 'dart:io';
+// import 'package:hive/hive.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:core';
+// import 'package:path/path.dart';
 
-// class TextDemoBody extends StatelessWidget {
-//   const TextDemoBody(
-//       {required this.start,
-//       required this.filepath,
-//       required this.lastLineNo,
-//       required this.submitData,
-//       required this.exitApp});
+// class AllServices {
+//   Future<List<String>> getFileData() async {
+//     List<String> allFiles = [];
+//     var folderDir = Directory('D:/FileRead');
+//     List files = folderDir.listSync();
 
-//   final String start;
-//   final String filepath;
-//   final String lastLineNo;
-//   final Function submitData;
-//   final Function exitApp;
+//     allFiles.clear();
+//     for (var file in files) {
+//       if (file is File) {
+//         allFiles.add(basename(file.path));
+//       }
+//     }
+//     return allFiles;
+//   }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       children: [
-//         Expanded(
-//           flex: 3,
-//           child: Container(
-//             color: Colors.grey[200],
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [
-//                 const SizedBox(height: 16.0),
-//                 SizedBox(
-//                   width: 150,
-//                   height: 40,
-//                   child: ElevatedButton(
-//                     onPressed: () async {
-//                       _SubmitData();
-//                     },
-//                     style: ButtonStyle(
-//                       backgroundColor: MaterialStateProperty.all<Color>(
-//                           Colors.blueGrey), // set your desired color here
-//                     ),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: const [
-//                         Text(
-//                           'Start',
-//                           textAlign: TextAlign.center,
-//                         ),
-//                         SizedBox(width: 8.0),
-//                         Icon(
-//                           Icons.play_arrow,
-//                           color: Colors.green, // set the color of the Icon
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 20),
-//                 SizedBox(
-//                   width: 150,
-//                   height: 40,
-//                   child: ElevatedButton(
-//                     onPressed: () async {
-//                       _exitApp();
-//                     },
-//                     style: ButtonStyle(
-//                       backgroundColor:
-//                           MaterialStateProperty.all<Color>(Colors.blueGrey),
-//                     ),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: const [
-//                         Text(
-//                           'End',
-//                           textAlign: TextAlign.center,
-//                         ),
-//                         SizedBox(width: 8.0),
-//                         Icon(
-//                           Icons.stop,
-//                           color: Colors.red, // set the color of the Icon
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//         const VerticalDivider(),
-//         Expanded(
-//           flex: 9,
-//           child: Container(
-//             color: Colors.cyan[50],
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               crossAxisAlignment: CrossAxisAlignment.center,
-//               children: [
-//                 start == 'config'
-//                     ? Center(
-//                         child: Text(
-//                           '$filepath = $lastLineNo',
-//                           style: const TextStyle(fontSize: 18),
-//                         ),
-//                       )
-//                     : start != '' && start != 'config'
-//                         ? Center(
-//                             child: Text(
-//                             start,
-//                             style: TextStyle(fontSize: 21),
-//                           ))
-//                         : Container(),
+//   List getFilePath() {
+//     var folderDir = Directory('D:/FileRead');
+//     List files = folderDir.listSync();
+//     return files;
+//   }
 
-//                 //CircularProgressIndicator(),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
+//   //.....Count Leading Whitespace............//
+//   int countLeadingWhitespace(String a) {
+//     int count = 0;
+//     for (int i = 0; i < a.length; i++) {
+//       if (a[i] == ' ') {
+//         count++;
+//       } else {
+//         break;
+//       }
+//     }
+//     return count;
+//   }
+
+//   List getFinalData(String fileName) {
+//     String path = 'D:/FileRead/' + fileName;
+//     final file = File(path);
+//     List<String> lines = file.readAsLinesSync();
+
+//     String subTotal = '';
+//     String chkNo = '';
+//     String employeeInfo = '';
+//     String epmployeeName = '';
+//     String employeeID = '';
+//     String vat = '';
+//     String paymentMode = '';
+//     String sd = '';
+//     String order_type = '';
+//     String terminal_id = '';
+//     String item = '';
+//     String item_name = '';
+//     String item_price = '';
+//     int nextChk = 0;
+//     int increment = 0;
+//     String discount = '';
+//     bool nextChkFound;
+//     bool sdFound;
+//     //last update//
+//     bool vatFound;
+//     bool subTotalFound;
+//     bool discountFound;
+//     String chkopenTime = '';
+// //........Store the data into this list............//
+//     List transactions = [];
+//     var lastNumber = lines.length;
+
+//     final _myBox = Hive.box('myBox');
+//     //_myBox.put('LASTNUMBER', 0);
+//     int startNumber = _myBox.get('$fileName') ?? 0;
+
+//     for (int i = startNumber; i < lastNumber; i++) {
+//       if (lines[i].contains('Chk ')) {
+//        // chkNo = lines[i].replaceAll('\r', '');
+//         if (lines[i].indexOf('Chk') == 0) {
+//         //  chkNo = lines[i];
+
+//           // Next chk line
+//           nextChkFound = false;
+//           for (int z = (i + 1); z < lastNumber; z++) {
+//             if (lines[z].contains('Chk ')) {
+//               chkNo = lines[i].replaceAll('\r', '');
+//               if (lines[z].indexOf('Chk') == 0) {
+//                 nextChk = z;
+//                 nextChkFound = true;
+//                 break;
+//               }
+//             }
+//           }
+//           if (!nextChkFound) {
+//             nextChk = lines.length;
+//           }
+
+//           //Employee Info//
+//           employeeInfo = lines[i + 1];
+//           List<String> emp =
+//               employeeInfo.replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//           employeeID = emp[0];
+//           epmployeeName = emp[1];
+//           terminal_id = emp[2];
+
+//           order_type = lines[i + 5].trim();
+
+//           //last update
+//           List<String> openTime =
+//               lines[i + 3].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//           chkopenTime = openTime[3];
+
+//           // Subtotal//
+//           for (int j = i + 1; j < nextChk; j++) {
+//             if (lines[j].contains('Subtotal')) {
+//               List<String> SubTot =
+//                   lines[j].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//               subTotal = SubTot[1];
+
+//               //Payment Mode//
+//               List<String> pm = lines[j - 1]
+//                   .replaceAll(RegExp(r'\s+'), ' ')
+//                   .trim()
+//                   .split(' ');
+//               paymentMode = pm[0];
+//               break;
+//             }
+//           }
+
+//           //VAT //
+//           for (int k = i + 1; k < nextChk; k++) {
+//             if (lines[k].contains('VAT')) {
+//               List<String> ValueAddedTax =
+//                   lines[k].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//               vat = ValueAddedTax[1];
+//               break;
+//             }
+//           }
+
+//           // SD //
+//           for (int l = i + 1; l < nextChk; l++) {
+//             if (lines[l].contains('SD')) {
+//               List<String> sd_value =
+//                   lines[l].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//               sd = sd_value[1];
+//               break;
+//             } else {
+//               sd = '0';
+//             }
+//           }
+
+//           // Item //
+//           var itemList = [];
+//           for (int k = i + 1; k < nextChk; k++) {
+//             if (countLeadingWhitespace(lines[k]) == 2) {
+//               List<String> itm =
+//                   lines[k].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//               item_price = itm[itm.length - 1];
+//               itm.removeLast();
+//               item_name = itm.join(' ');
+
+//               itemList.add({'name': item_name, 'price': item_price});
+//             }
+//           }
+
+//           // Discount//
+
+//           for (int p = i + 1; p < nextChk; p++) {
+//             if (lines[p].contains('DIS-')) {
+//               List<String> discountAmt =
+//                   lines[p].replaceAll(RegExp(r'\s+'), ' ').trim().split(' ');
+//               discount =
+//                   discountAmt[discountAmt.length - 1].replaceAll('-', '');
+//               break;
+//             } else {
+//               discount = '0';
+//             }
+//           }
+
+//           // Tax Info List
+//           var taxes = [];
+//           taxes.add({'vat': vat, 'sd': sd});
+
+//           //Payment Info List
+//           var payments = [];
+//           payments
+//               .add({'payment_type': paymentMode, 'payment_amount': subTotal});
+
+//           // Discount Info List
+//           var discountDetails = [];
+//           discountDetails.add({'id': '', 'name': '', 'amount': discount});
+
+//           transactions.add({
+//             'storeId': '',
+//             'check_number': chkNo,
+//             'employee_id': employeeID,
+//             'employee_name': epmployeeName,
+//             'terminal_id': terminal_id,
+//             'checkOpenTime': '',
+//             'checkCloseTime': '',
+//             'order_type': order_type,
+//             'items': itemList,
+//             'discountDetails': discountDetails,
+//             'taxes': taxes,
+//             'payments': payments,
+//             'subtotal': subTotal,
+//           });
+//         }
+//       }
+//     }
+//     //............Hive.............//
+//     // _myBox.put('$fileName', lastNumber);
+//     // var last = _myBox.get('$fileName');
+//     // print('Last Line number of $fileName: $last');
+//     //   //..........Hive part finish........//
+
+//     // if (transactions.isNotEmpty) {
+//     //   return transactions;
+//     // } else {
+//     //   return transactions;
+//     // }
+//     //..Here is the code for pass the data in Api link
+//     var finalData = [];
+//     finalData.add({
+//       'transactions': transactions,
+//       'file_name': fileName,
+//       'last_line_number': lastNumber
+//     });
+//     return finalData;
+//   }
+
+//   Future<http.Response> submitData(jsondata) async {
+//     http.Response response;
+
+//     var username = 'apiuser';
+//     var password = 'itsaDrill007';
+//     print('Basic ${base64.encode(utf8.encode('$username:$password'))}');
+
+//     response = await http.post(
+//         Uri.parse('http://w011.yeapps.com/tfl/api_tfl/receive_to_tfl'),
+// //Uri.parse('http://10.168.87.202/tfl/api_tfl_insert/_entry'),
+//         headers: <String, String>{
+//           'Authorization':
+//               'Basic ${base64.encode(utf8.encode('$username:$password'))}'
+//         },
+//         body: jsonEncode(jsondata));
+
+//     return response;
 //   }
 // }
+// // 

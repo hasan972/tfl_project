@@ -29,7 +29,7 @@ class _TextDemoState extends State<TextDemo> {
 
   void startTimer() {
     _timer?.cancel(); // Cancel any existing timer
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
       _SubmitData();
     });
     print('BackGround Service is running');
@@ -413,7 +413,7 @@ class _TextDemoState extends State<TextDemo> {
       if (finalList[0]['transactions'] != null &&
           finalList[0]['transactions'].isNotEmpty) {
         final response =
-            await AllServices().submitData(finalList[0]['transactions']);
+        await AllServices().submitData(finalList[0]['transactions']);
 
         print(jsonDecode(response.body));
         _myBox.put('$fileName', lastNumber);
