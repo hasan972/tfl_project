@@ -258,7 +258,7 @@ class AllServices {
 
     response = await http.post(
         //Uri.parse('http://w011.yeapps.com/tfl/api_tfl/receive_to_tfl'),
-Uri.parse('http://10.168.27.168/tfl/api_tfl_insert/_entry'),
+Uri.parse('http://10.168.27.168/tfl/api_insert/_entry'),
         // headers: <String, String>{
         //   'Authorization':
         //       'Basic ${base64.encode(utf8.encode('$username:$password'))}'
